@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的個人首頁</title>
+  <style>
+    :root {
+      --green: #245b4a;
+      --mint: #e5f2e9;
+      --yellow: #f5c85b;
+      --cream: #fffdf8;
+      --text: #1d2b25;
+      --muted: #687970;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background: linear-gradient(135deg, #f8f5ed, var(--mint));
+      font-family: "Microsoft JhengHei", "PingFang TC", sans-serif;
+      line-height: 1.7;
+    }
+
+    .container { width: min(1080px, calc(100% - 32px)); margin: auto; }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 0;
+    }
+
+    .logo { color: var(--green); font-size: 1.2rem; font-weight: bold; }
+    nav a { color: var(--green); text-decoration: none; font-weight: bold; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      align-items: center;
+      gap: 60px;
+      min-height: 560px;
+      padding: 50px 0 90px;
+    }
+
+    .tag { color: var(--green); font-size: .85rem; font-weight: bold; letter-spacing: .15em; }
+    h1 { margin: 14px 0 20px; font-family: Georgia, serif; font-size: clamp(3rem, 8vw, 5.8rem); line-height: 1.1; }
+    h1 span { color: var(--green); }
+    .intro { max-width: 560px; color: var(--muted); font-size: 1.1rem; }
+
+    .button {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 11px 22px;
+      border-radius: 8px;
+      color: var(--cream);
+      background: var(--green);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .profile {
+      padding: 36px 24px;
+      text-align: center;
+      background: var(--cream);
+      border: 1px solid #d7e4d9;
+      border-radius: 24px 24px 24px 80px;
+      box-shadow: 0 20px 50px rgba(36, 91, 74, .12);
+    }
+
+    .avatar {
+      display: grid;
+      width: 170px;
+      height: 170px;
+      margin: auto auto 24px;
+      place-items: center;
+      border: 12px solid var(--mint);
+      border-radius: 50%;
+      color: var(--green);
+      background: #f4faf2;
+      font-family: Georgia, serif;
+      font-size: 4.5rem;
+      font-weight: bold;
+    }
+
+    section { padding: 70px 0; }
+    h2 { margin: 8px 0 30px; font-family: Georgia, serif; font-size: 2.8rem; }
+    .about { max-width: 650px; color: var(--muted); font-size: 1.1rem; }
+
+    .interest-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .interest {
+      padding: 28px;
+      background: rgba(255, 253, 248, .85);
+      border: 1px solid #d7e4d9;
+      border-radius: 8px;
+    }
+
+    .icon { font-size: 2.5rem; }
+    h3 { margin: 16px 0 6px; font-size: 1.35rem; }
+    .interest p { margin: 0; color: var(--muted); }
+
+    footer { padding: 30px 0; color: var(--muted); text-align: center; font-size: .9rem; }
+
+    @media (max-width: 700px) {
+      .hero { grid-template-columns: 1fr; gap: 42px; padding-top: 35px; }
+      .interest-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 3.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">我的小角落</div>
+      <nav><a href="#interests">我的興趣 ↓</a></nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <div class="tag">HELLO, NICE TO MEET YOU</div>
+          <h1>嗨，我是<br><span>成大南工</span>的學生。</h1>
+          <p class="intro">歡迎來到我的個人首頁！我是成大南工的學生，這裡是我的自我介紹，也記錄著我喜歡的生活方式。</p>
+          <a class="button" href="#about">認識我</a>
+        </div>
+
+        <div class="profile">
+          <div class="avatar">我</div>
+          <strong>成大南工學生</strong>
+          <div style="color: #687970;">正在享受我的校園生活</div>
+        </div>
+      </section>
+
+      <section id="about">
+        <div class="tag">A LITTLE ABOUT ME</div>
+        <h2>關於我</h2>
+        <p class="about">我是一名成大南工的學生。平常除了學習，也喜歡安排自己的休閒時間，讓每天的生活保持輕鬆又有趣。</p>
+      </section>
+
+      <section id="interests">
+        <div class="tag">MY FAVORITE THINGS</div>
+        <h2>我的興趣</h2>
+        <div class="interest-grid">
+          <article class="interest">
+            <div class="icon">☁</div>
+            <h3>睡覺</h3>
+            <p>好好休息、補充能量，是迎接每一天的重要方法。</p>
+          </article>
+          <article class="interest">
+            <div class="icon">♫</div>
+            <h3>聽歌</h3>
+            <p>戴上耳機，讓喜歡的旋律陪伴我的日常生活。</p>
+          </article>
+          <article class="interest">
+            <div class="icon">▣</div>
+            <h3>打遊戲</h3>
+            <p>在遊戲世界裡放鬆，享受探索和挑戰的樂趣。</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer>© 2026 我的個人首頁</footer>
+  </div>
+</body>
+</html>
