@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stickman Game</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Microsoft JhengHei", sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(to bottom, #bfe6ff, #eaf7ff);
+    }
+
+    .game-box {
+      width: 900px;
+      max-width: 95vw;
+      text-align: center;
+    }
+
+    h1 {
+      color: #1a3a5f;
+      margin-bottom: 12px;
+      font-size: 2rem;
+    }
+
+    .info {
+      margin-bottom: 10px;
+      color: #2b4d6a;
+      font-weight: 600;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 4px solid #2d6c9d;
+      border-radius: 12px;
+      background: linear-gradient(to bottom, #c2e8ff, #f2fbff);
+      box-shadow: 0 12px 28px rgba(35, 84, 121, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="game-box">
+    <h1>火柴人躲障礙</h1>
+    <div class="info">操作：↑ / ↓ / ← / → 移動火柴人</div>
+    <canvas id="gameCanvas" width="900" height="500"></canvas>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const state = {
+      keys: {
+        ArrowUp: false,
+        ArrowDown: false,
+        ArrowLeft: false,
+        ArrowRight: false,
+        w: false,
+        s: false,
+        a: false,
+        d: false
+      }
+    };
+
+    const player = {
+      x: 120,
+      y: canvas.height / 2,
+      radius: 22,
+      step: 8
+    };
+
+    function update() {
+      if (state.keys.ArrowUp || state.keys.w) {
+        player.y -= player.step;
+      }
+      if (state.keys.ArrowDown || state.keys.s) {
+        player.y += player.step;
+      }
+      if (state.keys.ArrowLeft || state.keys.a) {
+        player.x -= player.step;
+      }
+      if (state.keys.ArrowRight || state.keys.d) {
+        player.x += player.step;
+      }
+
+      player.x = Math.max(30, Math.min(canvas.width - 30, player.x));
+      player.y = Math.max(35, Math.min(canvas.height - 35, player.y));
+    }
+
+    function drawStickman(x, y, size) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      ctx.strokeStyle = '#1d3557';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
+
+      ctx.beginPath();
+      ctx.moveTo(0, -size * 1.8);
+      ctx.lineTo(0, -size * 0.4);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, -size * 1.1);
+      ctx.lineTo(-size * 0.8, 0);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, -size * 1.1);
+      ctx.lineTo(size * 0.8, 0);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, -size * 0.4);
+      ctx.lineTo(-size * 0.8, size * 1.2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, -size * 0.4);
+      ctx.lineTo(size * 0.8, size * 1.2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(0, -size * 2.2, size, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#dff6ff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#a3d7ff';
+      ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+
+      drawStickman(player.x, player.y, player.radius / 2.1);
+    }
+
+    function gameLoop() {
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    document.addEventListener('keydown', (event) => {
+      const key = event.key;
+      if (key === 'ArrowUp' || key === 'w' || key === 'W') state.keys.ArrowUp = true;
+      if (key === 'ArrowDown' || key === 's' || key === 'S') state.keys.ArrowDown = true;
+      if (key === 'ArrowLeft' || key === 'a' || key === 'A') state.keys.ArrowLeft = true;
+      if (key === 'ArrowRight' || key === 'd' || key === 'D') state.keys.ArrowRight = true;
+
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+        event.preventDefault();
+      }
+    });
+
+    document.addEventListener('keyup', (event) => {
+      const key = event.key;
+      if (key === 'ArrowUp' || key === 'w' || key === 'W') state.keys.ArrowUp = false;
+      if (key === 'ArrowDown' || key === 's' || key === 'S') state.keys.ArrowDown = false;
+      if (key === 'ArrowLeft' || key === 'a' || key === 'A') state.keys.ArrowLeft = false;
+      if (key === 'ArrowRight' || key === 'd' || key === 'D') state.keys.ArrowRight = false;
+    });
+
+    requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>
