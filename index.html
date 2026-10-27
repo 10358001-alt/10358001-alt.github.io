@@ -1,181 +1,340 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stickman Game</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f6edda">
+  <title>打地鼠！— 開心農場</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: "Microsoft JhengHei", sans-serif;
+    :root {
+      color-scheme: light;
+      --ink: #3b3426;
+      --muted: #827966;
+      --green: #4f843d;
+      --green-dark: #38632d;
+      --cream: #fffaf0;
+      --soil: #8c5738;
+      --soil-dark: #68402d;
     }
+
+    * { box-sizing: border-box; }
 
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
       min-height: 100vh;
-      background: linear-gradient(to bottom, #bfe6ff, #eaf7ff);
+      margin: 0;
+      padding: 28px 16px 36px;
+      display: grid;
+      place-items: center;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 12% 18%, #fff8dc 0 7%, transparent 7.2%),
+        radial-gradient(ellipse at 88% 78%, #e8f0cf 0 10%, transparent 10.2%),
+        #f6edda;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
     }
 
-    .game-box {
-      width: 900px;
-      max-width: 95vw;
+    .game {
+      width: min(100%, 560px);
+      padding: clamp(22px, 5vw, 38px);
+      border: 3px solid #e8d9b8;
+      border-radius: 30px;
+      background: var(--cream);
+      box-shadow: 0 18px 0 #e4d4b2, 0 26px 48px #6d59301c;
       text-align: center;
     }
 
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--green);
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .18em;
+    }
+
     h1 {
-      color: #1a3a5f;
-      margin-bottom: 12px;
-      font-size: 2rem;
+      margin: 0;
+      font-size: clamp(2rem, 8vw, 3rem);
+      letter-spacing: .06em;
     }
 
-    .info {
-      margin-bottom: 10px;
-      color: #2b4d6a;
-      font-weight: 600;
+    .subtitle {
+      margin: 8px 0 24px;
+      color: var(--muted);
+      font-size: .95rem;
     }
 
-    canvas {
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .stat {
+      padding: 11px 6px 9px;
+      border: 2px solid #eee4ce;
+      border-radius: 16px;
+      background: #fffdf8;
+    }
+
+    .stat-label {
       display: block;
-      width: 100%;
-      height: auto;
-      border: 4px solid #2d6c9d;
-      border-radius: 12px;
-      background: linear-gradient(to bottom, #c2e8ff, #f2fbff);
-      box-shadow: 0 12px 28px rgba(35, 84, 121, 0.2);
+      margin-bottom: 2px;
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 1.65rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.15;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(10px, 3vw, 18px);
+      padding: clamp(13px, 4vw, 22px);
+      border: 5px solid #6f9c4b;
+      border-radius: 24px;
+      background:
+        radial-gradient(ellipse at 20% 20%, #ffffff26 0 2px, transparent 3px),
+        radial-gradient(ellipse at 80% 75%, #ffffff20 0 2px, transparent 3px),
+        #8eb85f;
+      box-shadow: inset 0 5px 0 #ffffff35, 0 7px 0 #577d3c;
+    }
+
+    .hole {
+      position: relative;
+      min-width: 0;
+      aspect-ratio: 1.18;
+      overflow: hidden;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      cursor: crosshair;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hole::before {
+      position: absolute;
+      right: 3%;
+      bottom: 4%;
+      left: 3%;
+      height: 45%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at 50% 35%, #b4774d, var(--soil) 62%, var(--soil-dark));
+      box-shadow: inset 0 7px 0 #a96d46, 0 5px 0 #65432d;
+      content: "";
+    }
+
+    .mole {
+      position: absolute;
+      z-index: 1;
+      bottom: 12%;
+      left: 50%;
+      width: 75%;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 4px solid #795034;
+      border-radius: 48% 48% 42% 42%;
+      background: linear-gradient(145deg, #dca66e, #bb8051);
+      box-shadow: inset -7px -6px 0 #9c6545;
+      font-size: clamp(2.4rem, 11vw, 4.1rem);
+      line-height: 1;
+      transform: translate(-50%, 115%);
+      transition: transform 120ms ease-out;
+      user-select: none;
+    }
+
+    .hole.active .mole { transform: translate(-50%, 0); }
+    .hole:focus-visible { outline: 4px solid #fff2a8; outline-offset: -5px; }
+    .hole:active .mole { scale: .92; }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 25px;
+    }
+
+    .start-button {
+      min-width: 190px;
+      padding: 13px 28px;
+      border: 0;
+      border-radius: 999px;
+      color: white;
+      background: var(--green);
+      box-shadow: 0 5px 0 var(--green-dark);
+      font: inherit;
+      font-size: 1.05rem;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 100ms, background 150ms;
+    }
+
+    .start-button:hover { background: #5d9448; }
+    .start-button:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--green-dark); }
+    .start-button:focus-visible { outline: 3px solid #d5aa45; outline-offset: 4px; }
+
+    .message {
+      min-height: 1.5em;
+      margin: 17px 0 0;
+      color: var(--muted);
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    @media (max-width: 380px) {
+      body { padding-inline: 10px; }
+      .game { padding: 20px 16px; }
+      .stat-value { font-size: 1.4rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: .01ms !important; }
     }
   </style>
 </head>
 <body>
-  <div class="game-box">
-    <h1>火柴人躲障礙</h1>
-    <div class="info">操作：↑ / ↓ / ← / → 移動火柴人</div>
-    <canvas id="gameCanvas" width="900" height="500"></canvas>
-  </div>
+  <main class="game">
+    <p class="eyebrow">WELCOME TO THE FARM</p>
+    <h1>打地鼠！</h1>
+    <p class="subtitle">眼明手快，趁地鼠探頭時點下去！</p>
+
+    <section class="scoreboard" aria-label="遊戲分數">
+      <div class="stat">
+        <span class="stat-label">目前分數</span>
+        <span class="stat-value" id="score">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">剩餘時間</span>
+        <span class="stat-value"><span id="time">30</span><small> 秒</small></span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">最高紀錄</span>
+        <span class="stat-value" id="best">0</span>
+      </div>
+    </section>
+
+    <section class="board" id="board" aria-label="打地鼠遊戲區">
+      <button class="hole" type="button" aria-label="地洞 1"><span class="mole" aria-hidden="true">🐹</span></button>
+      <button class="hole" type="button" aria-label="地洞 2"><span class="mole" aria-hidden="true">🐹</span></button>
+      <button class="hole" type="button" aria-label="地洞 3"><span class="mole" aria-hidden="true">🐹</span></button>
+      <button class="hole" type="button" aria-label="地洞 4"><span class="mole" aria-hidden="true">🐹</span></button>
+      <button class="hole" type="button" aria-label="地洞 5"><span class="mole" aria-hidden="true">🐹</span></button>
+      <button class="hole" type="button" aria-label="地洞 6"><span class="mole" aria-hidden="true">🐹</span></button>
+      <button class="hole" type="button" aria-label="地洞 7"><span class="mole" aria-hidden="true">🐹</span></button>
+      <button class="hole" type="button" aria-label="地洞 8"><span class="mole" aria-hidden="true">🐹</span></button>
+      <button class="hole" type="button" aria-label="地洞 9"><span class="mole" aria-hidden="true">🐹</span></button>
+    </section>
+
+    <div class="controls">
+      <button class="start-button" id="start" type="button">開始遊戲</button>
+    </div>
+    <p class="message" id="message" aria-live="polite">準備好了嗎？按下開始挑戰！</p>
+  </main>
 
   <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+    const holes = [...document.querySelectorAll(".hole")];
+    const scoreDisplay = document.querySelector("#score");
+    const timeDisplay = document.querySelector("#time");
+    const bestDisplay = document.querySelector("#best");
+    const startButton = document.querySelector("#start");
+    const message = document.querySelector("#message");
 
-    const state = {
-      keys: {
-        ArrowUp: false,
-        ArrowDown: false,
-        ArrowLeft: false,
-        ArrowRight: false,
-        w: false,
-        s: false,
-        a: false,
-        d: false
-      }
-    };
+    let score = 0;
+    let timeLeft = 30;
+    let activeHole = -1;
+    let previousHole = -1;
+    let gameTimer;
+    let moleTimer;
+    let isPlaying = false;
+    let bestScore = Number(localStorage.getItem("whack-a-mole-best") || 0);
 
-    const player = {
-      x: 120,
-      y: canvas.height / 2,
-      radius: 22,
-      step: 8
-    };
+    bestDisplay.textContent = bestScore;
 
-    function update() {
-      if (state.keys.ArrowUp || state.keys.w) {
-        player.y -= player.step;
-      }
-      if (state.keys.ArrowDown || state.keys.s) {
-        player.y += player.step;
-      }
-      if (state.keys.ArrowLeft || state.keys.a) {
-        player.x -= player.step;
-      }
-      if (state.keys.ArrowRight || state.keys.d) {
-        player.x += player.step;
-      }
-
-      player.x = Math.max(30, Math.min(canvas.width - 30, player.x));
-      player.y = Math.max(35, Math.min(canvas.height - 35, player.y));
+    function hideMoles() {
+      holes.forEach((hole) => hole.classList.remove("active"));
+      activeHole = -1;
     }
 
-    function drawStickman(x, y, size) {
-      ctx.save();
-      ctx.translate(x, y);
-
-      ctx.strokeStyle = '#1d3557';
-      ctx.lineWidth = 4;
-      ctx.lineCap = 'round';
-
-      ctx.beginPath();
-      ctx.moveTo(0, -size * 1.8);
-      ctx.lineTo(0, -size * 0.4);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(0, -size * 1.1);
-      ctx.lineTo(-size * 0.8, 0);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(0, -size * 1.1);
-      ctx.lineTo(size * 0.8, 0);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(0, -size * 0.4);
-      ctx.lineTo(-size * 0.8, size * 1.2);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(0, -size * 0.4);
-      ctx.lineTo(size * 0.8, size * 1.2);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.arc(0, -size * 2.2, size, 0, Math.PI * 2);
-      ctx.stroke();
-
-      ctx.restore();
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#dff6ff';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = '#a3d7ff';
-      ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
-
-      drawStickman(player.x, player.y, player.radius / 2.1);
-    }
-
-    function gameLoop() {
-      update();
-      draw();
-      requestAnimationFrame(gameLoop);
-    }
-
-    document.addEventListener('keydown', (event) => {
-      const key = event.key;
-      if (key === 'ArrowUp' || key === 'w' || key === 'W') state.keys.ArrowUp = true;
-      if (key === 'ArrowDown' || key === 's' || key === 'S') state.keys.ArrowDown = true;
-      if (key === 'ArrowLeft' || key === 'a' || key === 'A') state.keys.ArrowLeft = true;
-      if (key === 'ArrowRight' || key === 'd' || key === 'D') state.keys.ArrowRight = true;
-
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
-        event.preventDefault();
+    function showMole() {
+      hideMoles();
+      let nextHole = Math.floor(Math.random() * holes.length);
+      if (holes.length > 1 && nextHole === previousHole) {
+        nextHole = (nextHole + 1 + Math.floor(Math.random() * (holes.length - 1))) % holes.length;
       }
+      previousHole = nextHole;
+      activeHole = nextHole;
+      holes[nextHole].classList.add("active");
+
+      const speed = Math.max(430, 900 - Math.floor(score / 20) * 55);
+      moleTimer = window.setTimeout(() => {
+        if (isPlaying && activeHole === nextHole) {
+          hideMoles();
+          scheduleMole();
+        }
+      }, speed);
+    }
+
+    function scheduleMole() {
+      if (!isPlaying) return;
+      moleTimer = window.setTimeout(showMole, 280 + Math.random() * 350);
+    }
+
+    function endGame() {
+      isPlaying = false;
+      window.clearTimeout(gameTimer);
+      window.clearTimeout(moleTimer);
+      hideMoles();
+      startButton.textContent = "再玩一次";
+      message.textContent = `時間到！你得到 ${score} 分，真是太棒了！`;
+    }
+
+    function startGame() {
+      window.clearTimeout(gameTimer);
+      window.clearTimeout(moleTimer);
+      score = 0;
+      timeLeft = 30;
+      previousHole = -1;
+      isPlaying = true;
+      scoreDisplay.textContent = score;
+      timeDisplay.textContent = timeLeft;
+      startButton.textContent = "遊戲進行中…";
+      message.textContent = "快點地鼠，每次命中 +10 分！";
+      showMole();
+
+      gameTimer = window.setInterval(() => {
+        timeLeft -= 1;
+        timeDisplay.textContent = timeLeft;
+        if (timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    holes.forEach((hole, index) => {
+      hole.addEventListener("click", () => {
+        if (!isPlaying || index !== activeHole) return;
+
+        score += 10;
+        scoreDisplay.textContent = score;
+        if (score > bestScore) {
+          bestScore = score;
+          bestDisplay.textContent = bestScore;
+          localStorage.setItem("whack-a-mole-best", String(bestScore));
+          message.textContent = "新紀錄！繼續加油！";
+        }
+        window.clearTimeout(moleTimer);
+        hideMoles();
+        scheduleMole();
+      });
     });
 
-    document.addEventListener('keyup', (event) => {
-      const key = event.key;
-      if (key === 'ArrowUp' || key === 'w' || key === 'W') state.keys.ArrowUp = false;
-      if (key === 'ArrowDown' || key === 's' || key === 'S') state.keys.ArrowDown = false;
-      if (key === 'ArrowLeft' || key === 'a' || key === 'A') state.keys.ArrowLeft = false;
-      if (key === 'ArrowRight' || key === 'd' || key === 'D') state.keys.ArrowRight = false;
-    });
-
-    requestAnimationFrame(gameLoop);
+    startButton.addEventListener("click", startGame);
   </script>
 </body>
 </html>
