@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#f6edda">
-  <title>打地鼠！— 開心農場</title>
+  <meta name="theme-color" content="#111827">
+  <title>工程計算機</title>
   <style>
     :root {
-      color-scheme: light;
-      --ink: #3b3426;
-      --muted: #827966;
-      --green: #4f843d;
-      --green-dark: #38632d;
-      --cream: #fffaf0;
-      --soil: #8c5738;
-      --soil-dark: #68402d;
+      color-scheme: dark;
+      --page: #101522;
+      --panel: #1b2435;
+      --display: #121b2b;
+      --key: #273248;
+      --key-hover: #35435d;
+      --operator: #25364a;
+      --accent: #56d6c1;
+      --accent-dark: #20aa98;
+      --text: #f2f5fa;
+      --muted: #9aa8bc;
     }
 
     * { box-sizing: border-box; }
@@ -22,177 +25,140 @@
     body {
       min-height: 100vh;
       margin: 0;
-      padding: 28px 16px 36px;
+      padding: 28px 16px;
       display: grid;
       place-items: center;
-      color: var(--ink);
+      color: var(--text);
       background:
-        radial-gradient(ellipse at 12% 18%, #fff8dc 0 7%, transparent 7.2%),
-        radial-gradient(ellipse at 88% 78%, #e8f0cf 0 10%, transparent 10.2%),
-        #f6edda;
+        radial-gradient(ellipse at 18% 8%, #19384a 0, transparent 34%),
+        radial-gradient(ellipse at 92% 92%, #202c48 0, transparent 32%),
+        var(--page);
       font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
     }
 
-    .game {
-      width: min(100%, 560px);
-      padding: clamp(22px, 5vw, 38px);
-      border: 3px solid #e8d9b8;
-      border-radius: 30px;
-      background: var(--cream);
-      box-shadow: 0 18px 0 #e4d4b2, 0 26px 48px #6d59301c;
-      text-align: center;
+    .calculator {
+      width: min(100%, 430px);
+      padding: 22px;
+      border: 1px solid #ffffff12;
+      border-radius: 26px;
+      background: linear-gradient(155deg, #202b3e, var(--panel) 55%);
+      box-shadow: 0 28px 70px #0006, inset 0 1px 0 #ffffff12;
     }
 
-    .eyebrow {
-      margin: 0 0 6px;
-      color: var(--green);
-      font-size: .78rem;
-      font-weight: 900;
-      letter-spacing: .18em;
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
     }
 
-    h1 {
+    .brand {
       margin: 0;
-      font-size: clamp(2rem, 8vw, 3rem);
-      letter-spacing: .06em;
-    }
-
-    .subtitle {
-      margin: 8px 0 24px;
-      color: var(--muted);
       font-size: .95rem;
+      font-weight: 800;
+      letter-spacing: .12em;
     }
 
-    .scoreboard {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 20px;
+    .brand span { color: var(--accent); }
+
+    .mode-button {
+      padding: 7px 12px;
+      border: 1px solid #ffffff18;
+      border-radius: 999px;
+      color: var(--accent);
+      background: #111a28;
+      font: inherit;
+      font-size: .78rem;
+      font-weight: 800;
+      cursor: pointer;
     }
 
-    .stat {
-      padding: 11px 6px 9px;
-      border: 2px solid #eee4ce;
-      border-radius: 16px;
-      background: #fffdf8;
-    }
+    .mode-button:hover { background: #263449; }
+    button:focus-visible { outline: 2px solid #a4fff1; outline-offset: 2px; }
 
-    .stat-label {
-      display: block;
-      margin-bottom: 2px;
-      color: var(--muted);
-      font-size: .76rem;
-      font-weight: 700;
-    }
-
-    .stat-value {
-      display: block;
-      font-size: 1.65rem;
-      font-weight: 900;
-      font-variant-numeric: tabular-nums;
-      line-height: 1.15;
-    }
-
-    .board {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: clamp(10px, 3vw, 18px);
-      padding: clamp(13px, 4vw, 22px);
-      border: 5px solid #6f9c4b;
-      border-radius: 24px;
-      background:
-        radial-gradient(ellipse at 20% 20%, #ffffff26 0 2px, transparent 3px),
-        radial-gradient(ellipse at 80% 75%, #ffffff20 0 2px, transparent 3px),
-        #8eb85f;
-      box-shadow: inset 0 5px 0 #ffffff35, 0 7px 0 #577d3c;
-    }
-
-    .hole {
-      position: relative;
-      min-width: 0;
-      aspect-ratio: 1.18;
+    .screen {
+      min-height: 116px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 9px;
       overflow: hidden;
-      padding: 0;
-      border: 0;
-      border-radius: 50%;
-      background: transparent;
-      cursor: crosshair;
+      margin-bottom: 16px;
+      padding: 15px 17px;
+      border: 1px solid #ffffff0d;
+      border-radius: 17px;
+      background: var(--display);
+      text-align: right;
+    }
+
+    .expression {
+      min-height: 1.35em;
+      overflow-x: auto;
+      color: var(--muted);
+      font-size: 1rem;
+      white-space: nowrap;
+      scrollbar-width: thin;
+    }
+
+    .result {
+      min-height: 1.2em;
+      overflow-x: auto;
+      color: var(--text);
+      font-size: clamp(1.7rem, 8vw, 2.45rem);
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      white-space: nowrap;
+      scrollbar-width: thin;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .key {
+      min-width: 0;
+      min-height: 54px;
+      padding: 8px 3px;
+      border: 1px solid #ffffff0a;
+      border-radius: 13px;
+      color: var(--text);
+      background: var(--key);
+      font: inherit;
+      font-size: 1rem;
+      font-weight: 650;
+      cursor: pointer;
+      transition: background 120ms, transform 100ms, border-color 120ms;
       -webkit-tap-highlight-color: transparent;
     }
 
-    .hole::before {
-      position: absolute;
-      right: 3%;
-      bottom: 4%;
-      left: 3%;
-      height: 45%;
-      border-radius: 50%;
-      background: radial-gradient(ellipse at 50% 35%, #b4774d, var(--soil) 62%, var(--soil-dark));
-      box-shadow: inset 0 7px 0 #a96d46, 0 5px 0 #65432d;
-      content: "";
-    }
-
-    .mole {
-      position: absolute;
-      z-index: 1;
-      bottom: 12%;
-      left: 50%;
-      width: 75%;
-      aspect-ratio: 1;
-      display: grid;
-      place-items: center;
-      border: 4px solid #795034;
-      border-radius: 48% 48% 42% 42%;
-      background: linear-gradient(145deg, #dca66e, #bb8051);
-      box-shadow: inset -7px -6px 0 #9c6545;
-      font-size: clamp(2.4rem, 11vw, 4.1rem);
-      line-height: 1;
-      transform: translate(-50%, 115%);
-      transition: transform 120ms ease-out;
-      user-select: none;
-    }
-
-    .hole.active .mole { transform: translate(-50%, 0); }
-    .hole:focus-visible { outline: 4px solid #fff2a8; outline-offset: -5px; }
-    .hole:active .mole { scale: .92; }
-
-    .controls {
-      display: flex;
-      justify-content: center;
-      margin-top: 25px;
-    }
-
-    .start-button {
-      min-width: 190px;
-      padding: 13px 28px;
-      border: 0;
-      border-radius: 999px;
-      color: white;
-      background: var(--green);
-      box-shadow: 0 5px 0 var(--green-dark);
-      font: inherit;
-      font-size: 1.05rem;
+    .key:hover { border-color: #ffffff19; background: var(--key-hover); }
+    .key:active { transform: scale(.96); }
+    .key.function { color: #b6c8e0; font-size: .88rem; }
+    .key.operator { color: #8fe6d9; background: var(--operator); font-size: 1.2rem; }
+    .key.utility { color: #ffc98c; background: #3a3040; font-size: .86rem; }
+    .key.equals {
+      color: #102a2a;
+      background: var(--accent);
+      font-size: 1.3rem;
       font-weight: 900;
-      cursor: pointer;
-      transition: transform 100ms, background 150ms;
     }
+    .key.equals:hover { background: #79e7d6; }
+    .key.zero { grid-column: span 2; }
 
-    .start-button:hover { background: #5d9448; }
-    .start-button:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--green-dark); }
-    .start-button:focus-visible { outline: 3px solid #d5aa45; outline-offset: 4px; }
-
-    .message {
-      min-height: 1.5em;
-      margin: 17px 0 0;
+    .hint {
+      margin: 15px 0 0;
       color: var(--muted);
-      font-size: .9rem;
-      font-weight: 700;
+      font-size: .74rem;
+      line-height: 1.6;
+      text-align: center;
     }
 
     @media (max-width: 380px) {
-      body { padding-inline: 10px; }
-      .game { padding: 20px 16px; }
-      .stat-value { font-size: 1.4rem; }
+      .calculator { padding: 16px; }
+      .keypad { gap: 7px; }
+      .key { min-height: 49px; border-radius: 11px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -201,140 +167,364 @@
   </style>
 </head>
 <body>
-  <main class="game">
-    <p class="eyebrow">WELCOME TO THE FARM</p>
-    <h1>打地鼠！</h1>
-    <p class="subtitle">眼明手快，趁地鼠探頭時點下去！</p>
+  <main class="calculator" aria-label="工程計算機">
+    <header class="topbar">
+      <h1 class="brand">工程<span>計算機</span></h1>
+      <button class="mode-button" id="angle-mode" type="button" aria-label="切換角度模式">DEG</button>
+    </header>
 
-    <section class="scoreboard" aria-label="遊戲分數">
-      <div class="stat">
-        <span class="stat-label">目前分數</span>
-        <span class="stat-value" id="score">0</span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">剩餘時間</span>
-        <span class="stat-value"><span id="time">30</span><small> 秒</small></span>
-      </div>
-      <div class="stat">
-        <span class="stat-label">最高紀錄</span>
-        <span class="stat-value" id="best">0</span>
-      </div>
+    <section class="screen" aria-label="計算結果">
+      <div class="expression" id="expression" aria-live="polite"></div>
+      <output class="result" id="result" aria-live="polite">0</output>
     </section>
 
-    <section class="board" id="board" aria-label="打地鼠遊戲區">
-      <button class="hole" type="button" aria-label="地洞 1"><span class="mole" aria-hidden="true">🐹</span></button>
-      <button class="hole" type="button" aria-label="地洞 2"><span class="mole" aria-hidden="true">🐹</span></button>
-      <button class="hole" type="button" aria-label="地洞 3"><span class="mole" aria-hidden="true">🐹</span></button>
-      <button class="hole" type="button" aria-label="地洞 4"><span class="mole" aria-hidden="true">🐹</span></button>
-      <button class="hole" type="button" aria-label="地洞 5"><span class="mole" aria-hidden="true">🐹</span></button>
-      <button class="hole" type="button" aria-label="地洞 6"><span class="mole" aria-hidden="true">🐹</span></button>
-      <button class="hole" type="button" aria-label="地洞 7"><span class="mole" aria-hidden="true">🐹</span></button>
-      <button class="hole" type="button" aria-label="地洞 8"><span class="mole" aria-hidden="true">🐹</span></button>
-      <button class="hole" type="button" aria-label="地洞 9"><span class="mole" aria-hidden="true">🐹</span></button>
+    <section class="keypad" aria-label="計算機按鍵">
+      <button class="key utility" data-action="memory-clear" type="button">MC</button>
+      <button class="key utility" data-action="memory-recall" type="button">MR</button>
+      <button class="key utility" data-action="memory-add" type="button">M+</button>
+      <button class="key utility" data-action="clear" type="button">AC</button>
+      <button class="key utility" data-action="delete" type="button">DEL</button>
+
+      <button class="key function" data-insert="sin(" type="button">sin</button>
+      <button class="key function" data-insert="cos(" type="button">cos</button>
+      <button class="key function" data-insert="tan(" type="button">tan</button>
+      <button class="key function" data-insert="(" type="button">(</button>
+      <button class="key function" data-insert=")" type="button">)</button>
+
+      <button class="key function" data-insert="asin(" type="button">sin⁻¹</button>
+      <button class="key function" data-insert="acos(" type="button">cos⁻¹</button>
+      <button class="key function" data-insert="atan(" type="button">tan⁻¹</button>
+      <button class="key function" data-insert="!" type="button">n!</button>
+      <button class="key function" data-insert="π" type="button">π</button>
+
+      <button class="key function" data-insert="sqrt(" type="button">√</button>
+      <button class="key function" data-insert="^2" type="button">x²</button>
+      <button class="key function" data-insert="^" type="button">xʸ</button>
+      <button class="key function" data-insert="e" type="button">e</button>
+      <button class="key function" data-insert="^-1" type="button">1/x</button>
+
+      <button class="key function" data-insert="log(" type="button">log</button>
+      <button class="key function" data-insert="ln(" type="button">ln</button>
+      <button class="key function" data-insert="abs(" type="button">|x|</button>
+      <button class="key function" data-insert="exp(" type="button">exp</button>
+      <button class="key function" data-insert="cbrt(" type="button">∛</button>
+
+      <button class="key" data-insert="7" type="button">7</button>
+      <button class="key" data-insert="8" type="button">8</button>
+      <button class="key" data-insert="9" type="button">9</button>
+      <button class="key function" data-insert="%" type="button">mod</button>
+      <button class="key operator" data-insert="×" type="button">×</button>
+
+      <button class="key" data-insert="4" type="button">4</button>
+      <button class="key" data-insert="5" type="button">5</button>
+      <button class="key" data-insert="6" type="button">6</button>
+      <button class="key function" data-insert="Ans" type="button">Ans</button>
+      <button class="key operator" data-insert="÷" type="button">÷</button>
+
+      <button class="key" data-insert="1" type="button">1</button>
+      <button class="key" data-insert="2" type="button">2</button>
+      <button class="key" data-insert="3" type="button">3</button>
+      <button class="key operator" data-insert="-" type="button">−</button>
+      <button class="key operator" data-insert="+" type="button">+</button>
+
+      <button class="key zero" data-insert="0" type="button">0</button>
+      <button class="key function" data-insert="." type="button">.</button>
+      <button class="key" data-action="sign" type="button">±</button>
+      <button class="key equals" data-action="equals" type="button">=</button>
     </section>
 
-    <div class="controls">
-      <button class="start-button" id="start" type="button">開始遊戲</button>
-    </div>
-    <p class="message" id="message" aria-live="polite">準備好了嗎？按下開始挑戰！</p>
+    <p class="hint">支援鍵盤輸入：數字、+ − × ÷、括號與 Enter 計算</p>
   </main>
 
   <script>
-    const holes = [...document.querySelectorAll(".hole")];
-    const scoreDisplay = document.querySelector("#score");
-    const timeDisplay = document.querySelector("#time");
-    const bestDisplay = document.querySelector("#best");
-    const startButton = document.querySelector("#start");
-    const message = document.querySelector("#message");
+    const expressionDisplay = document.querySelector("#expression");
+    const resultDisplay = document.querySelector("#result");
+    const angleButton = document.querySelector("#angle-mode");
+    const keypad = document.querySelector(".keypad");
 
-    let score = 0;
-    let timeLeft = 30;
-    let activeHole = -1;
-    let previousHole = -1;
-    let gameTimer;
-    let moleTimer;
-    let isPlaying = false;
-    let bestScore = Number(localStorage.getItem("whack-a-mole-best") || 0);
+    let expression = "";
+    let answer = 0;
+    let memory = 0;
+    let angleMode = "DEG";
+    let justEvaluated = false;
 
-    bestDisplay.textContent = bestScore;
+    function tokenize(source) {
+      const tokens = [];
+      let position = 0;
 
-    function hideMoles() {
-      holes.forEach((hole) => hole.classList.remove("active"));
-      activeHole = -1;
-    }
+      while (position < source.length) {
+        const rest = source.slice(position);
+        const number = rest.match(/^(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?/i);
+        const identifier = rest.match(/^(?:asin|acos|atan|sqrt|cbrt|sin|cos|tan|log|abs|exp|ln|Ans|π|e)/i);
 
-    function showMole() {
-      hideMoles();
-      let nextHole = Math.floor(Math.random() * holes.length);
-      if (holes.length > 1 && nextHole === previousHole) {
-        nextHole = (nextHole + 1 + Math.floor(Math.random() * (holes.length - 1))) % holes.length;
+        if (/\s/.test(source[position])) {
+          position += 1;
+          continue;
+        }
+        if (number) {
+          tokens.push({ type: "number", value: Number(number[0]) });
+          position += number[0].length;
+          continue;
+        }
+        if (identifier) {
+          const value = identifier[0];
+          tokens.push({ type: "identifier", value: value === "π" ? "pi" : value });
+          position += value.length;
+          continue;
+        }
+        const character = source[position];
+        const mapped = { "×": "*", "÷": "/", "−": "-" }[character] || character;
+        if ("+-*/%^!()".includes(mapped)) {
+          tokens.push({ type: "operator", value: mapped });
+          position += 1;
+          continue;
+        }
+        throw new Error(`無法辨識的符號：${character}`);
       }
-      previousHole = nextHole;
-      activeHole = nextHole;
-      holes[nextHole].classList.add("active");
 
-      const speed = Math.max(430, 900 - Math.floor(score / 20) * 55);
-      moleTimer = window.setTimeout(() => {
-        if (isPlaying && activeHole === nextHole) {
-          hideMoles();
-          scheduleMole();
+      const expanded = [];
+      const canEndValue = (token) =>
+        token.type === "number" ||
+        (token.type === "identifier" && ["pi", "e", "Ans"].includes(token.value)) ||
+        (token.type === "operator" && [")", "!"].includes(token.value));
+      const canStartValue = (token) =>
+        token.type === "number" ||
+        token.type === "identifier" ||
+        (token.type === "operator" && token.value === "(");
+
+      for (const token of tokens) {
+        const previous = expanded[expanded.length - 1];
+        if (previous && canEndValue(previous) && canStartValue(token)) {
+          expanded.push({ type: "operator", value: "*" });
         }
-      }, speed);
+        expanded.push(token);
+      }
+      return expanded;
     }
 
-    function scheduleMole() {
-      if (!isPlaying) return;
-      moleTimer = window.setTimeout(showMole, 280 + Math.random() * 350);
-    }
+    function calculate(source) {
+      const tokens = tokenize(source);
+      let index = 0;
 
-    function endGame() {
-      isPlaying = false;
-      window.clearTimeout(gameTimer);
-      window.clearTimeout(moleTimer);
-      hideMoles();
-      startButton.textContent = "再玩一次";
-      message.textContent = `時間到！你得到 ${score} 分，真是太棒了！`;
-    }
+      function peek(value) {
+        return tokens[index]?.value === value;
+      }
 
-    function startGame() {
-      window.clearTimeout(gameTimer);
-      window.clearTimeout(moleTimer);
-      score = 0;
-      timeLeft = 30;
-      previousHole = -1;
-      isPlaying = true;
-      scoreDisplay.textContent = score;
-      timeDisplay.textContent = timeLeft;
-      startButton.textContent = "遊戲進行中…";
-      message.textContent = "快點地鼠，每次命中 +10 分！";
-      showMole();
+      function take(value) {
+        if (!peek(value)) throw new Error("算式格式不正確");
+        index += 1;
+      }
 
-      gameTimer = window.setInterval(() => {
-        timeLeft -= 1;
-        timeDisplay.textContent = timeLeft;
-        if (timeLeft <= 0) endGame();
-      }, 1000);
-    }
-
-    holes.forEach((hole, index) => {
-      hole.addEventListener("click", () => {
-        if (!isPlaying || index !== activeHole) return;
-
-        score += 10;
-        scoreDisplay.textContent = score;
-        if (score > bestScore) {
-          bestScore = score;
-          bestDisplay.textContent = bestScore;
-          localStorage.setItem("whack-a-mole-best", String(bestScore));
-          message.textContent = "新紀錄！繼續加油！";
+      function factorial(value) {
+        if (value < 0 || !Number.isInteger(value) || value > 170) {
+          throw new Error("階乘僅支援 0 到 170 的整數");
         }
-        window.clearTimeout(moleTimer);
-        hideMoles();
-        scheduleMole();
-      });
+        let total = 1;
+        for (let n = 2; n <= value; n += 1) total *= n;
+        return total;
+      }
+
+      function primary() {
+        const token = tokens[index];
+        if (!token) throw new Error("算式尚未完成");
+
+        if (token.type === "number") {
+          index += 1;
+          return token.value;
+        }
+        if (token.value === "(") {
+          index += 1;
+          const value = additive();
+          take(")");
+          return value;
+        }
+        if (token.type === "identifier") {
+          index += 1;
+          if (token.value === "pi") return Math.PI;
+          if (token.value === "e") return Math.E;
+          if (token.value === "Ans") return answer;
+
+          take("(");
+          const value = additive();
+          take(")");
+          const radians = angleMode === "DEG" ? value * Math.PI / 180 : value;
+          switch (token.value) {
+            case "sin": return Math.sin(radians);
+            case "cos": return Math.cos(radians);
+            case "tan": return Math.tan(radians);
+            case "asin": {
+              const result = Math.asin(value);
+              return angleMode === "DEG" ? result * 180 / Math.PI : result;
+            }
+            case "acos": {
+              const result = Math.acos(value);
+              return angleMode === "DEG" ? result * 180 / Math.PI : result;
+            }
+            case "atan": {
+              const result = Math.atan(value);
+              return angleMode === "DEG" ? result * 180 / Math.PI : result;
+            }
+            case "sqrt": return Math.sqrt(value);
+            case "cbrt": return Math.cbrt(value);
+            case "log": return Math.log10(value);
+            case "ln": return Math.log(value);
+            case "abs": return Math.abs(value);
+            case "exp": return Math.exp(value);
+            default: throw new Error("不支援的函數");
+          }
+        }
+        throw new Error("算式格式不正確");
+      }
+
+      function power() {
+        let value = primary();
+        while (peek("!")) {
+          index += 1;
+          value = factorial(value);
+        }
+        if (peek("^")) {
+          index += 1;
+          value = value ** unary();
+        }
+        return value;
+      }
+
+      function unary() {
+        if (peek("+")) {
+          index += 1;
+          return unary();
+        }
+        if (peek("-")) {
+          index += 1;
+          return -unary();
+        }
+        return power();
+      }
+
+      function multiplicative() {
+        let value = unary();
+        while (peek("*") || peek("/") || peek("%")) {
+          const operator = tokens[index++].value;
+          const right = unary();
+          if (operator === "*") value *= right;
+          if (operator === "/") value /= right;
+          if (operator === "%") value %= right;
+        }
+        return value;
+      }
+
+      function additive() {
+        let value = multiplicative();
+        while (peek("+") || peek("-")) {
+          const operator = tokens[index++].value;
+          const right = multiplicative();
+          value = operator === "+" ? value + right : value - right;
+        }
+        return value;
+      }
+
+      if (tokens.length === 0) throw new Error("請輸入算式");
+      const value = additive();
+      if (index !== tokens.length) throw new Error("算式格式不正確");
+      if (!Number.isFinite(value)) throw new Error("結果超出範圍或無法計算");
+      return value;
+    }
+
+    function formatNumber(value) {
+      if (Object.is(value, -0) || Math.abs(value) < 1e-14) return "0";
+      return String(Number(value.toPrecision(12)));
+    }
+
+    function render() {
+      expressionDisplay.textContent = expression;
+      resultDisplay.textContent = expression ? " " : "0";
+    }
+
+    function insert(value) {
+      if (justEvaluated && /^[0-9.]$/.test(value)) expression = "";
+      justEvaluated = false;
+      expression += value;
+      resultDisplay.textContent = " ";
+      expressionDisplay.textContent = expression;
+    }
+
+    function evaluate() {
+      if (!expression) return;
+      try {
+        const value = calculate(expression);
+        answer = value;
+        expressionDisplay.textContent = `${expression} =`;
+        resultDisplay.textContent = formatNumber(value);
+        expression = formatNumber(value);
+        justEvaluated = true;
+      } catch (error) {
+        expressionDisplay.textContent = expression;
+        resultDisplay.textContent = error.message;
+        justEvaluated = true;
+      }
+    }
+
+    function clear() {
+      expression = "";
+      justEvaluated = false;
+      expressionDisplay.textContent = "";
+      resultDisplay.textContent = "0";
+    }
+
+    function performAction(action) {
+      if (action === "equals") evaluate();
+      if (action === "clear") clear();
+      if (action === "delete") {
+        if (justEvaluated) clear();
+        else {
+          expression = expression.slice(0, -1);
+          render();
+        }
+      }
+      if (action === "sign") insert("-");
+      if (action === "memory-clear") memory = 0;
+      if (action === "memory-recall") insert(formatNumber(memory));
+      if (action === "memory-add") {
+        if (!expression) return;
+        try {
+          memory += calculate(expression);
+          justEvaluated = false;
+        } catch (error) {
+          expressionDisplay.textContent = expression;
+          resultDisplay.textContent = error.message;
+        }
+      }
+    }
+
+    keypad.addEventListener("click", (event) => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      if (button.dataset.insert !== undefined) insert(button.dataset.insert);
+      if (button.dataset.action) performAction(button.dataset.action);
     });
 
-    startButton.addEventListener("click", startGame);
+    angleButton.addEventListener("click", () => {
+      angleMode = angleMode === "DEG" ? "RAD" : "DEG";
+      angleButton.textContent = angleMode;
+      angleButton.setAttribute("aria-label", `目前為${angleMode}角度模式，點擊切換`);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (/^[0-9.]$/.test(event.key)) insert(event.key);
+      else if (event.key === "+") insert("+");
+      else if (event.key === "-") insert("-");
+      else if (event.key === "*") insert("×");
+      else if (event.key === "/") {
+        event.preventDefault();
+        insert("÷");
+      } else if (event.key === "%") insert("%");
+      else if (event.key === "^" || event.key === "(" || event.key === ")") insert(event.key);
+      else if (event.key === "Enter" || event.key === "=") {
+        event.preventDefault();
+        evaluate();
+      } else if (event.key === "Backspace") performAction("delete");
+      else if (event.key === "Escape") clear();
+    });
   </script>
 </body>
 </html>
