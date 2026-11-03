@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>火柴人遊戲</title>
+  <style>
+    :root {
+      --bg1: #8fd3ff;
+      --bg2: #dff7ff;
+      --ground: #4b9f6b;
+      --ground2: #357b50;
+      --panel: rgba(12, 22, 38, 0.72);
+      --button: #ffffff;
+      --button-text: #1d3557;
+      --danger: #ff5a5a;
+      --gold: #ffd166;
+      --accent: #ff8fab;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "Microsoft JhengHei", Arial, sans-serif;
+      background: linear-gradient(var(--bg1), var(--bg2));
+      color: #fff;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+    }
+
+    .game-shell {
+      width: min(100vw, 480px);
+      height: min(100vh - 12px, 900px);
+      position: relative;
+      border-radius: 24px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #8ed8ff 0%, #d9f7ff 62%, #dfffe6 100%);
+      box-shadow: 0 20px 40px rgba(23, 40, 60, 0.25);
+      border: 3px solid rgba(255,255,255,0.4);
+    }
+
+    canvas {
+      width: 100%;
+      height: calc(100% - 110px);
+      display: block;
+      background: transparent;
+      touch-action: none;
+    }
+
+    .hud {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .badge {
+      background: var(--panel);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 1px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    .title {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(4px);
+      padding: 8px 12px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .controls {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 110px;
+      background: rgba(12, 20, 31, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      z-index: 6;
+    }
+
+    .pad {
+      display: flex;
+      gap: 16px;
+    }
+
+    .button {
+      width: 76px;
+      height: 76px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--button-text);
+      font-size: 28px;
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .button:active {
+      transform: scale(0.96);
+      opacity: 0.92;
+    }
+
+    .jump-btn {
+      width: 92px;
+      height: 92px;
+      background: linear-gradient(135deg, #ffd166, #ff9f1c);
+      color: #3e2400;
+      font-size: 32px;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 25, 38, 0.4);
+      z-index: 10;
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .panel {
+      width: min(82%, 340px);
+      background: rgba(18, 26, 42, 0.82);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 24px;
+      padding: 22px 20px 18px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
+
+    .panel h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      letter-spacing: 2px;
+    }
+
+    .panel p {
+      margin: 0 0 18px;
+      font-size: 16px;
+      line-height: 1.8;
+      color: #e7faff;
+    }
+
+    .start-btn {
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #7ef29a, #41d673);
+      color: #0b3c1a;
+      font-size: 20px;
+      font-weight: 800;
+      padding: 12px 26px;
+      box-shadow: 0 8px 18px rgba(65, 214, 115, 0.35);
+    }
+  </style>
+</head>
+<body>
+  <div class="game-shell">
+    <div class="hud">
+      <div class="badge" id="score">分數: 0</div>
+      <div class="title">火柴人大冒險</div>
+    </div>
+
+    <canvas id="gameCanvas" width="480" height="720"></canvas>
+
+    <div class="controls">
+      <div class="pad">
+        <button class="button" id="leftBtn" aria-label="向左">◀</button>
+        <button class="button" id="rightBtn" aria-label="向右">▶</button>
+      </div>
+      <button class="button jump-btn" id="jumpBtn" aria-label="跳躍">▲</button>
+    </div>
+
+    <div class="overlay" id="startOverlay">
+      <div class="panel">
+        <h1>開始！</h1>
+        <p>控制火柴人躲避障礙物，收集星星，盡量活得更久！</p>
+        <button class="start-btn" id="startBtn">開始遊戲</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const startOverlay = document.getElementById('startOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const leftBtn = document.getElementById('leftBtn');
+    const rightBtn = document.getElementById('rightBtn');
+    const jumpBtn = document.getElementById('jumpBtn');
+
+    const state = {
+      running: false,
+      score: 0,
+      lastTime: 0,
+      speed: 3.8,
+      spawnTimer: 0,
+      starTimer: 0,
+      backgroundShift: 0,
+      groundY: 0,
+      player: {
+        x: 110,
+        y: 0,
+        width: 28,
+        height: 72,
+        vy: 0,
+        jumping: false,
+        facing: 1,
+      },
+      obstacles: [],
+      stars: [],
+      particles: []
+    };
+
+    function resizeCanvas() {
+      const shell = canvas.parentElement;
+      const rect = shell.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height - 110;
+      canvas.width = width;
+      canvas.height = height;
+      state.groundY = canvas.height - 46;
+      state.player.y = state.groundY - state.player.height;
+    }
+
+    function resetGame() {
+      state.running = true;
+      state.score = 0;
+      state.speed = 3.8;
+      state.spawnTimer = 0;
+      state.starTimer = 0;
+      state.backgroundShift = 0;
+      state.obstacles = [];
+      state.stars = [];
+      state.particles = [];
+      state.player.x = 110;
+      state.player.y = state.groundY - state.player.height;
+      state.player.vy = 0;
+      state.player.jumping = false;
+      state.player.facing = 1;
+      scoreEl.textContent = '分數: 0';
+      startOverlay.classList.add('hidden');
+    }
+
+    function randomBetween(min, max) {
+      return min + Math.random() * (max - min);
+    }
+
+    function createObstacle() {
+      const width = randomBetween(18, 38);
+      const height = randomBetween(28, 62);
+      state.obstacles.push({
+        x: canvas.width + 20,
+        y: state.groundY - height,
+        width,
+        height,
+        color: Math.random() > 0.5 ? '#ff5a5a' : '#ff9561'
+      });
+    }
+
+    function createStar() {
+      const size = 15;
+      state.stars.push({
+        x: canvas.width + 20,
+        y: randomBetween(140, state.groundY - 90),
+        size,
+        pulse: Math.random() * Math.PI * 2
+      });
+    }
+
+    function playerRectangle() {
+      return {
+        x: state.player.x - 12,
+        y: state.player.y,
+        width: 24,
+        height: state.player.height
+      };
+    }
+
+    function checkCollisions() {
+      const rect = playerRectangle();
+
+      for (const obstacle of state.obstacles) {
+        const hit = rect.x < obstacle.x + obstacle.width &&
+          rect.x + rect.width > obstacle.x &&
+          rect.y < obstacle.y + obstacle.height &&
+          rect.y + rect.height > obstacle.y;
+
+        if (hit) {
+          state.running = false;
+          startOverlay.classList.remove('hidden');
+          const title = startOverlay.querySelector('h1');
+          const text = startOverlay.querySelector('p');
+          title.textContent = '遊戲結束';
+          text.textContent = '你拿到 ' + state.score + ' 分！再挑戰一次吧！';
+          startBtn.textContent = '再玩一次';
+          return;
+        }
+      }
+
+      for (const star of state.stars) {
+        const distanceX = Math.abs(star.x - (state.player.x + 8));
+        const distanceY = Math.abs(star.y - (state.player.y + 28));
+        if (distanceX < 18 && distanceY < 18) {
+          star.collected = true;
+          state.score += 10;
+          scoreEl.textContent = '分數: ' + state.score;
+          for (let i = 0; i < 12; i++) {
+            state.particles.push({
+              x: star.x,
+              y: star.y,
+              vx: randomBetween(-2, 2),
+              vy: randomBetween(-2.8, -0.6),
+              life: 25,
+              color: '#ffd166'
+            });
+          }
+        }
+      }
+
+      state.stars = state.stars.filter(star => !star.collected);
+    }
+
+    function update(delta) {
+      if (!state.running) return;
+
+      state.score += delta * 0.012;
+      scoreEl.textContent = '分數: ' + Math.floor(state.score);
+
+      state.speed += delta * 0.00012;
+      state.backgroundShift += state.speed * 0.9;
+
+      const player = state.player;
+      const gravity = 0.62;
+      player.vy += gravity;
+      player.y += player.vy;
+
+      if (player.y >= state.groundY - player.height) {
+        player.y = state.groundY - player.height;
+        player.vy = 0;
+        player.jumping = false;
+      }
+
+      state.spawnTimer += delta;
+      state.starTimer += delta;
+      if (state.spawnTimer > 1200 / (1 + state.speed * 0.12)) {
+        createObstacle();
+        state.spawnTimer = 0;
+      }
+      if (state.starTimer > 1800) {
+        createStar();
+        state.starTimer = 0;
+      }
+
+      for (const obstacle of state.obstacles) {
+        obstacle.x -= state.speed * (delta / 16.67);
+      }
+      for (const star of state.stars) {
+        star.x -= state.speed * (delta / 16.67);
+        star.pulse += 0.12;
+      }
+
+      state.obstacles = state.obstacles.filter(obstacle => obstacle.x + obstacle.width > -20);
+      state.stars = state.stars.filter(star => star.x + star.size > -20);
+
+      for (const particle of state.particles) {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.vy += 0.12;
+        particle.life -= 1;
+      }
+      state.particles = state.particles.filter(p => p.life > 0);
+
+      checkCollisions();
+    }
+
+    function drawGround() {
+      ctx.fillStyle = '#5cb97b';
+      ctx.fillRect(0, state.groundY, canvas.width, canvas.height - state.groundY);
+
+      ctx.fillStyle = '#38885a';
+      for (let x = -state.backgroundShift % 40; x < canvas.width + 40; x += 40) {
+        ctx.fillRect(x, state.groundY + 10, 20, 18);
+      }
+    }
+
+    function drawSky() {
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      skyGrad.addColorStop(0, '#8ed8ff');
+      skyGrad.addColorStop(0.7, '#dff9ff');
+      skyGrad.addColorStop(1, '#d9ffe8');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      for (let i = 0; i < 16; i++) {
+        const x = (i * 53 + (state.backgroundShift * 0.3)) % (canvas.width + 40) - 20;
+        const y = 48 + (i % 5) * 34;
+        ctx.beginPath();
+        ctx.arc(x, y, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function drawPlayer() {
+      const p = state.player;
+      const x = p.x;
+      const y = p.y;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#212529';
+      ctx.beginPath();
+      ctx.moveTo(12, 10);
+      ctx.lineTo(12, 44);
+      ctx.moveTo(12, 18);
+      ctx.lineTo(2, 28);
+      ctx.moveTo(12, 18);
+      ctx.lineTo(24, 28);
+      ctx.moveTo(12, 44);
+      ctx.lineTo(2, 62);
+      ctx.moveTo(12, 44);
+      ctx.lineTo(24, 62);
+      ctx.moveTo(12, 26);
+      ctx.lineTo(26, 22);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(12, 6, 7, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#ff5a5a';
+      ctx.beginPath();
+      ctx.moveTo(26, 22);
+      ctx.lineTo(30, 30);
+      ctx.lineTo(36, 24);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawObstacle(obstacle) {
+      ctx.fillStyle = obstacle.color;
+      ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.fillRect(obstacle.x + 4, obstacle.y + 4, obstacle.width - 8, 8);
+    }
+
+    function drawStar(star) {
+      const cx = star.x;
+      const cy = star.y;
+      const s = star.size + Math.sin(star.pulse) * 2.5;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.fillStyle = '#ffd166';
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const angle = (Math.PI / 5) * i - Math.PI / 2;
+        const x = Math.cos(angle) * (i % 2 === 0 ? s : s * 0.5);
+        const y = Math.sin(angle) * (i % 2 === 0 ? s : s * 0.5);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawParticles() {
+      for (const p of state.particles) {
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = Math.max(0, p.life / 25);
+        ctx.fillRect(p.x, p.y, 4, 4);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function render() {
+      drawSky();
+      drawGround();
+
+      for (const obstacle of state.obstacles) drawObstacle(obstacle);
+      for (const star of state.stars) drawStar(star);
+      drawParticles();
+      drawPlayer();
+    }
+
+    function loop(timestamp) {
+      const delta = timestamp - state.lastTime || 16.7;
+      state.lastTime = timestamp;
+      update(delta);
+      render();
+      requestAnimationFrame(loop);
+    }
+
+    function jump() {
+      if (!state.running) return;
+      if (!state.player.jumping) {
+        state.player.vy = -14.5;
+        state.player.jumping = true;
+      }
+    }
+
+    function handlePress(key) {
+      if (key === 'ArrowLeft' || key === 'a') {
+        state.player.x = Math.max(20, state.player.x - 18);
+        state.player.facing = -1;
+      }
+      if (key === 'ArrowRight' || key === 'd') {
+        state.player.x = Math.min(canvas.width - 30, state.player.x + 18);
+        state.player.facing = 1;
+      }
+      if (key === 'ArrowUp' || key === 'w' || key === ' ') {
+        jump();
+      }
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === ' ' || event.key === 'ArrowUp' || event.key === 'w') {
+        event.preventDefault();
+      }
+      handlePress(event.key);
+    });
+
+    leftBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      state.player.x = Math.max(20, state.player.x - 18);
+      state.player.facing = -1;
+    }, { passive: false });
+
+    rightBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      state.player.x = Math.min(canvas.width - 30, state.player.x + 18);
+      state.player.facing = 1;
+    }, { passive: false });
+
+    jumpBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      jump();
+    }, { passive: false });
+
+    leftBtn.addEventListener('click', () => {
+      state.player.x = Math.max(20, state.player.x - 18);
+      state.player.facing = -1;
+    });
+
+    rightBtn.addEventListener('click', () => {
+      state.player.x = Math.min(canvas.width - 30, state.player.x + 18);
+      state.player.facing = 1;
+    });
+
+    jumpBtn.addEventListener('click', jump);
+
+    startBtn.addEventListener('click', () => {
+      startOverlay.classList.remove('hidden');
+      resetGame();
+    });
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    resetGame();
+    startOverlay.classList.remove('hidden');
+    startBtn.textContent = '開始遊戲';
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
