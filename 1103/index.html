@@ -220,6 +220,38 @@
     const rightBtn = document.getElementById('rightBtn');
     const jumpBtn = document.getElementById('jumpBtn');
 
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playTone(freq, duration, type = 'sine', volume = 0.05) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      gain.gain.value = volume;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      const ramp = 0.03;
+      gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.stop(audioCtx.currentTime + duration + ramp);
+    }
+
+    function playJumpSound() {
+      playTone(420, 0.07, 'square', 0.04);
+      playTone(620, 0.08, 'triangle', 0.03);
+    }
+
+    function playHitSound() {
+      playTone(180, 0.16, 'sawtooth', 0.06);
+      playTone(110, 0.2, 'square', 0.05);
+    }
+
+    function playCoinSound() {
+      playTone(780, 0.08, 'triangle', 0.04);
+      playTone(1040, 0.09, 'triangle', 0.04);
+    }
+
     const state = {
       running: false,
       score: 0,
@@ -325,6 +357,7 @@
           title.textContent = '遊戲結束';
           text.textContent = '你拿到 ' + state.score + ' 分！再挑戰一次吧！';
           startBtn.textContent = '再玩一次';
+          playHitSound();
           return;
         }
       }
@@ -336,6 +369,7 @@
           star.collected = true;
           state.score += 10;
           scoreEl.textContent = '分數: ' + state.score;
+          playCoinSound();
           for (let i = 0; i < 12; i++) {
             state.particles.push({
               x: star.x,
@@ -530,6 +564,7 @@
       if (!state.player.jumping) {
         state.player.vy = -14.5;
         state.player.jumping = true;
+        playJumpSound();
       }
     }
 
