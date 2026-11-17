@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>訪客計數器</title>
+    <style>
+      :root {
+        --bg: #f4f7fb;
+        --card: #ffffff;
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --shadow: rgba(37, 99, 235, 0.15);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: Arial, "Microsoft JhengHei", sans-serif;
+        background: linear-gradient(135deg, #eef4ff 0%, var(--bg) 100%);
+        color: var(--text);
+      }
+
+      .card {
+        width: min(90vw, 420px);
+        background: var(--card);
+        border-radius: 20px;
+        box-shadow: 0 12px 30px var(--shadow);
+        padding: 32px 24px;
+        text-align: center;
+      }
+
+      .title {
+        margin: 0 0 16px;
+        font-size: 2rem;
+      }
+
+      .count-box {
+        margin: 18px 0 26px;
+        padding: 24px 16px;
+        background: #eff6ff;
+        border-radius: 14px;
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 700;
+        color: var(--primary-dark);
+      }
+
+      button {
+        border: none;
+        border-radius: 12px;
+        background: var(--primary);
+        color: #fff;
+        padding: 14px 22px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+
+      button:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      .status {
+        margin-top: 16px;
+        min-height: 1.5em;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1 class="title">訪客計數器</h1>
+      <div id="count" class="count-box">載入中...</div>
+      <button id="countBtn" type="button">點我增加 1</button>
+      <div id="status" class="status">正在讀取資料...</div>
+    </div>
+
+    <script>
+      const scriptUrl = 'https://script.google.com/macros/s/你的AppsScript部署ID/exec';
+      const countEl = document.getElementById('count');
+      const statusEl = document.getElementById('status');
+      const countBtn = document.getElementById('countBtn');
+
+      async function getCount() {
+        try {
+          statusEl.textContent = '讀取中...';
+          const response = await fetch(scriptUrl + '?action=get', {
+            method: 'GET',
+            cache: 'no-store'
+          });
+
+          if (!response.ok) {
+            throw new Error('讀取失敗');
+          }
+
+          const data = await response.json();
+          countEl.textContent = data.count ?? 0;
+          statusEl.textContent = '資料已更新';
+        } catch (error) {
+          console.error(error);
+          statusEl.textContent = '讀取失敗，請確認 GAS 連結是否正確';
+        }
+      }
+
+      async function incrementCount() {
+        try {
+          statusEl.textContent = '更新中...';
+          countBtn.disabled = true;
+
+          const response = await fetch(scriptUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ action: 'increment' })
+          });
+
+          if (!response.ok) {
+            throw new Error('更新失敗');
+          }
+
+          const data = await response.json();
+          countEl.textContent = data.count ?? 0;
+          statusEl.textContent = '計數已更新';
+        } catch (error) {
+          console.error(error);
+          statusEl.textContent = '更新失敗，請確認 GAS 連結是否正確';
+        } finally {
+          countBtn.disabled = false;
+        }
+      }
+
+      countBtn.addEventListener('click', incrementCount);
+      getCount();
+    </script>
+  </body>
+</html>
