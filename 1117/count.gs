@@ -27,13 +27,20 @@ function doPost(e) {
   const action = data.action || 'increment';
 
   if (action === 'increment') {
-    const count = getCount() + 1;
-    PropertiesService.getScriptProperties().setProperty('VISIT_COUNT', String(count));
+    const lock = LockService.getScriptLock();
+    lock.waitLock(10000);
 
-    return jsonResponse({
-      success: true,
-      count: count
-    });
+    try {
+      const count = getCount() + 1;
+      PropertiesService.getScriptProperties().setProperty('VISIT_COUNT', String(count));
+
+      return jsonResponse({
+        success: true,
+        count: count
+      });
+    } finally {
+      lock.releaseLock();
+    }
   }
 
   if (action === 'get') {
@@ -58,4 +65,4 @@ function jsonResponse(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
-}function
+}
