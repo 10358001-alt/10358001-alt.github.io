@@ -273,6 +273,45 @@
     .calculator-keys span:nth-child(3n) { background: #56b9a7; }
     .calculator-keys span:nth-child(5) { background: #8eddd0; }
 
+    .art-counter {
+      background:
+        radial-gradient(circle at 50% 110%, #9db5f7 0 42%, transparent 42.5%),
+        linear-gradient(155deg, #eef2ff, #dbe5ff 75%);
+    }
+
+    .counter-art {
+      position: relative;
+      z-index: 1;
+      width: 146px;
+      padding: 18px 16px 14px;
+      border: 3px solid #3d4d78;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #1d2a4d, #11182d);
+      box-shadow: 0 12px 0 #6579bb, 0 20px 24px #314c9030;
+      transform: rotate(3deg);
+    }
+
+    .counter-number {
+      display: grid;
+      height: 68px;
+      place-items: center;
+      border-radius: 10px;
+      color: #83a7ff;
+      background: #0b1226;
+      font-size: 2.8rem;
+      font-weight: 900;
+    }
+
+    .counter-button {
+      display: block;
+      width: 72%;
+      height: 24px;
+      margin: 12px auto 0;
+      border-radius: 7px;
+      background: #3970d6;
+      box-shadow: 0 5px 0 #24519b;
+    }
+
     .mole-character {
       position: relative;
       z-index: 1;
@@ -447,6 +486,24 @@
               </div>
               <p>支援三角函數、次方、對數與角度模式切換的工程計算機。</p>
               <span class="tag">計算工具</span>
+            </div>
+          </a>
+
+          <a class="project-card" href="../1117/index.html">
+            <div class="art art-counter" aria-hidden="true">
+              <span class="art-label">04 / COUNTER</span>
+              <span class="counter-art">
+                <span class="counter-number">1</span>
+                <span class="counter-button"></span>
+              </span>
+            </div>
+            <div class="card-info">
+              <div class="card-topline">
+                <h3>訪客計數器</h3>
+                <span class="arrow" aria-hidden="true">→</span>
+              </div>
+              <p>透過雲端資料庫記錄訪客次數，並可即時讀取與累加計數。</p>
+              <span class="tag">雲端互動</span>
             </div>
           </a>
         </div>
